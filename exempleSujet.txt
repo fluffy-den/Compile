@@ -1,0 +1,38 @@
+Durand 8 HEURES DEBUT 5 ADULTE 5 ENFANT,
+Dupont 8 HEURES DEBUT 2 ADULTE 1 ENFANT,
+Dupont 13 HEURES FIN,
+Durand 18 HEURES FIN,
+Legros 18 HEURES DEBUT 20 ADULTE 10 ENFANT , 
+Legros 19 HEURES FIN;	/
+
+Commentaire : exemple du sujet 2022
+###################################
+Une seule journee, trois clients qui louent et rendent une seule fois chacun
+       Dupont 10 euros par heure pendant 5 heures = 50 euros
+       Durand 30 euros par heure pendant 10 heures = 300 euros
+       Legros 100 euros par heure pendant 1 heure = 100 euros
+
+Resultat attendu
+################
+
+Le client:  DUPONT  doit payer : 50 euros pour 2 velo(s) adulte et 1 velo(s) enfant 
+
+Le client:  DURAND  doit payer : 300 euros pour 5 velo(s) adulte et 5 velo(s) enfant 
+
+Le client:  LEGROS  doit payer : 100 euros pour 20 velo(s) adulte et 10 velo(s) enfant 
+
+BILAN DU JOUR  1
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Nombre de velos adulte manquants :  0
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 6 - Nombre total d'operations : 6
+
+Voici les clients qui doivent encore rendre des velos
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+--------------    ----       ---        ---       ---     
+
+
+Le jour de plus grande affluence  est : 1  avec 3 clients différents servis

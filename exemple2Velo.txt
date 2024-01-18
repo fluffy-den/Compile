@@ -1,0 +1,76 @@
+Masson  9 HEURES DEBUT 2 ADULTE 1 ENFANT,
+Girard  9 HEURES DEBUT 2 ADULTE 1 ENFANT,
+Masson 11 HEURES FIN,
+Masson 15 HEURES DEBUT 20 ADULTE 10 ENFANT,
+Masson 16 HEURES FIN,
+Grazon 17 HEURES DEBUT 20 ADULTE 10 ENFANT,
+Girard 19 HEURES FIN; 
+
+Grazon 8 HEURES FIN;
+
+Girard 9 HEURES DEBUT 20 ADULTE 5 ENFANT,
+Masson 9 HEURES DEBUT 2 ADULTE 1 ENFANT,
+Masson 11 HEURES FIN,
+Andonov 12 HEURES DEBUT 2 ADULTE 1 ENFANT; 
+
+Girard 8 HEURES FIN;
+/
+		Test fourni aux etudiants
+		Il y a deux jours de plus grande affluence (jour 1 et jour 3), 
+		on rend arbitrairement le premier des deux
+		Ci-après, affichage attendu:
+
+Le client:  MASSON  doit payer : 20 euros pour 2 velo(s) adulte et 1 velo(s) enfant 
+
+Le client:  MASSON  doit payer : 100 euros pour 20 velo(s) adulte et 10 velo(s) enfant 
+ 
+Le client:  GIRARD  doit payer : 100 euros pour 2 velo(s) adulte et 1 velo(s) enfant 
+
+******************************************************************************
+BILAN DU JOUR  1
+
+      CLIENT      JOUR   HEURE_DEBUT  ADULTE   ENFANT
+---------------    ----      ---       ---       ---     
+GRAZON             1        17        20        10
+
+Le client:  GRAZON  doit payer : 200 euros pour 20 velo(s) adulte et 10 velo(s) enfant 
+
+******************************************************************************
+BILAN DU JOUR  2
+
+      CLIENT      JOUR   HEURE_DEBUT  ADULTE   ENFANT
+---------------    ----      ---       ---       ---     
+
+Le client:  MASSON  doit payer : 20 euros pour 2 velo(s) adulte et 1 velo(s) enfant 
+
+ pour continuer tapez entree 
+******************************************************************************
+BILAN DU JOUR  3
+
+      CLIENT      JOUR   HEURE_DEBUT  ADULTE   ENFANT
+---------------    ----      ---       ---       ---     
+GIRARD             3         9        20         5
+ANDONOV            3        12         2         1
+
+Le client:  GIRARD  doit payer : 900 euros pour 20 velo(s) adulte et 5 velo(s) enfant 
+ 
+******************************************************************************
+BILAN DU JOUR  4
+
+      CLIENT      JOUR   HEURE_DEBUT  ADULTE   ENFANT
+---------------    ----      ---       ---       ---     
+ANDONOV            3        12         2         1
+
+**************************** BILAN FINAL **********************************
+Nombre de velos adulte manquants :  2
+Nombre de velos enfant manquants :  1
+Operations correctes : 13 - Nombre total d'operations : 13
+
+Voici les clients qui doivent encore rendre des velos
+
+      CLIENT      JOUR   HEURE_DEBUT  ADULTE   ENFANT
+---------------    ----      ---       ---       ---     
+ANDONOV            3        12         2         1
+
+**************************** BILAN AFFLUENCE **********************************
+Le jour de plus grande affluence  est : 1  avec 3 clients différents servis
