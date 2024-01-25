@@ -13,20 +13,20 @@ public class ActVelo extends AutoVelo {
 
 	/** table des actions */
 	private final int[][] ACTION =
-		{ 	/* Etat     ADULTE DEBUT ENFANT   FIN   HEURES  IDENT  NBENTIER  VIRG PTVIRG  BARRE AUTRES  */
-			/* 0  */    {  -1,  -1,    -1,    -1,     -1,     1,      -1,     -1,   -1,    10,    -1     },
-			/* 1  */    {  -1,   4,    -1,     6,     -1,    -1,       2,     -1,   -1,    -1,    -1     },
-			/* 2  */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
-			/* 3  */    {  -1,   3,    -1,     5,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
-			/* 4  */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,    9,    -1,    -1     },
-			/* 5  */    {  -1,  -1,    -1,    -1,     -1,    -1,       2,     -1,   -1,    -1,    -1     },
-			/* 6  */    {   7,  -1,     8,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
-			/* 7  */    {  -1,  -1,    -1,    -1,     -1,    -1,       2,     -1,    9,    -1,    -1     },
-			/* 8  */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,    9,    -1,    -1     },
-			/* 9  */    {  -1,  -1,     8,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
-			/* 10 */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
-			/* 11 */ 	{  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     }
-		} ;
+	{       /* Etat     ADULTE DEBUT ENFANT   FIN   HEURES  IDENT  NBENTIER  VIRG PTVIRG  BARRE AUTRES  */
+			/* 0  */   {  10,   10,    10,     10,    10,     1,      10,    10,   10,      9,    10   },
+			/* 1  */   {  10,    3,    10,      5,    10,    10,      10,    10,   10,     10,    10   },
+			/* 2  */   {  10,   10,    10,     10,    10,    10,      10,    10,   10,     10,    10   },
+			/* 3  */   {  10,    2,    10,      4,    10,    10,      10,    10,   10,     10,    10   },
+			/* 4  */   {  10,   10,    10,     10,    10,    10,      10,    10,   10,     10,    10   },
+			/* 5  */   {  10,   10,    10,     10,    10,    10,      10,    10,   10,     10,    10   },
+			/* 6  */   {   6,   10,     7,     10,    10,    10,      10,    10,   10,     10,    10   },
+			/* 7  */   {  10,   10,    10,     10,    10,    10,      10,    10,    8,     10,    10   },
+			/* 8  */   {  10,   10,     7,     10,    10,    10,      10,    10,   10,     10,    10   },
+			/* 9  */   {  10,   10,    10,     10,    10,     1,      10,    10,   10,     10,    10   },
+			/* 10 */   {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,     11,    -1   },
+			/* 11 */   {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,     -1,    -1   }
+	} ;
 
 	/** constructeur classe ActVelo
 	 * @param flot : donnee a analyser
@@ -421,37 +421,21 @@ public class ActVelo extends AutoVelo {
 				}
 
 				// Affichage
-				Ecriture.ecrireStringln("Le jour de plus grande affluence est le jour : " + maxJour + " avec " + maxClients + " clients différents servis.");
+				Ecriture.ecrireStringln("Le jour de plus grande affluence est le jour : " + maxJour + " avec " +
+						maxClients + " clients différents servis.");
 				break;
 			}
 
 			case 10: {
 				// Gestion erreur de syntaxe
 				Ecriture.ecrireStringln("Erreur de syntaxe sur " + lex.getCarLu() + "...");
+				break;
+			}
 
-				// Lis les prochains symboles
-				boolean ptVirgAvantBarre = true;
-				int s = lex.lireSymb();
-				while (true)
-				{
-					if (s == lex.BARRE)
-					{
-						// On ignore le dernier jour pour le bilan du nombre maximum de personnes dans une journée
-						this.clientsParJour.remove(this.jourCourant);
-						this.jourCourant--;
-						break;
-					}
-					else if (s == lex.PTVIRG || s == lex.VIRG)
-					{
-						break;
-					}
-					else
-					{
-						s = lex.lireSymb();
-					}
-				}
-
-
+			case 11: {
+				// On ignore le dernier jour pour le bilan général
+				this.clientsParJour.remove(this.jourCourant);
+				this.jourCourant--;
 				break;
 			}
 
