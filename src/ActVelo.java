@@ -90,7 +90,12 @@ public class ActVelo extends AutoVelo {
 
 	
 	/** nombre de velos initialement disponibles */
-	private static final int MAX_VELOS_ADULTES = 50, MAX_VELOS_ENFANTS = 20;
+	private static final int MAX_VELOS_ADULTES = 50;
+	private static final int MAX_VELOS_ENFANTS = 20;
+
+	/** tarifs des velos **/
+	private static final int TARIF_ADULTES = 4;
+	private static final int TARIF_ENFANTS = 2;
 	
 
 	/**
@@ -117,7 +122,7 @@ public class ActVelo extends AutoVelo {
 
 	// Rappel: chaque <Validation> correspond a un jour different
 	// jourCourant correspond a la <Validation> en cours d'analyse
-	private int jourCourant=1;
+	private int jourCourant;
 	
 	// Rappel: chaque <Validation> est composee de plusieurs operations 
 	// nbOperationTotales correspond a toutes les operations contenues dans la donnee a analyser
@@ -142,6 +147,7 @@ public class ActVelo extends AutoVelo {
 	 */
 	private void initialisations() {
 		this.nbOperationCorrectes = 0; this.nbOperationTotales = 0;
+		this.jourCourant=1;
 		this.clientsParJour=new ArrayList<SmallSet>();
 		/** initialisation clients du premier jour
 		 * NB: le jour 0 n'est pas utilise */
@@ -152,66 +158,199 @@ public class ActVelo extends AutoVelo {
 	} // fin initialisations
 
 	/**
+	 * @return Cast de this.analyseurLexical vers le type fille de type LexVelo
+	 */
+	private LexVelo getLex() {
+		return (LexVelo)this.analyseurLexical;
+	}
+
+	/**
 	 * execution d'une action
 	 * @param numAction :  numero de l'action a executer
 	 */
 	public void executer(int numAction) {
 		System.out.println("etat  " + etatCourant + "  action  " + numAction);
 
+		// Récupère l'instance de l'analyseur lexical
+		LexVelo lex = this.getLex();
+
 		// getNumIdCourant = id du client actuel
 		// getvalEnt = valeur entière de nbentier
-
 		switch (numAction) {
-			case -1:	// action vide
+			case -1: {    // action vide
 				break;
+			}
 
-			case 0:
+			case 0: {
 				// Réinitialize les variables des actions
 				this.initAction();
 				break;
+			}
 
-			case 1:
+			case 1: {
+				// Gère un nouveau identifiant
+				String nom = lex.chaineIdent(lex.getNumIdCourant());
 
+				// Ajout d'un nouveau client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
+				if (infos == null) {
+					maBaseDeLoc.enregistrerLoc(nom, this.jourCourant, -1, -1, -1);
+				}
+
+				// Ajout du client dans la liste des clients du jour
+				this.clientsParJour.get(this.jourCourant).add(lex.getNumIdCourant());
 				break;
+			}
 
-			case 2:
-				// Lis le nombre récupéré par l'analyseur lexical //TODO
+			case 2: {
+				// Récupération de la base donnée du client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				if (infos == null) {
+					// TODO: erreur infos est null
+					return;
+				}
+
+				// Récupération de l'heure de début
+				int hdebut = lex.getvalEnt();
+				if (hdebut < 8 || hdebut > 19)
+				{
+					// TODO: erreur hdebut n'est pas compris entre [8, 19]
+					return;
+				}
+
+				// Modification heures debut du client actuel
+				infos.heureDebut = hdebut;
 				break;
+			}
 
-			case 3:
+			case 3: {
+				// Récupération de la base donnée du client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				if (infos == null) {
+					// TODO: erreur infos est null
+					return;
+				}
 
+				// Modification heures debut du client actuel à 8 (par défaut)
+				infos.heureDebut = 8;
 				break;
+			}
 
-			case 4:
+			case 4: {
+				// Récupération de la base donnée du client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				if (infos == null) {
+					// TODO: erreur infos est null
+					return;
+				}
 
+				// Récupération de l'heure de fin
+				int hfin = lex.getvalEnt();
+				if (hfin < 8 || hfin > 19)
+				{
+					// TODO: erreur hdebut n'est pas compris entre [8, 19]
+					return;
+				}
+
+				// Calcul du montant à calculer
+				int prix = calculDureeLoc(infos.jourEmprunt, infos.heureDebut, this.jourCourant, hfin) * (infos.qteAdulte * TARIF_ADULTES + infos.qteEnfant * TARIF_ENFANTS);
+
+				// Suppression de la location en cours
+				maBaseDeLoc.supprimerClient(lex.chaineIdent(lex.getNumIdCourant()));
+
+				// Récupération des vélos
+				this.nbVelosAdultesRestants += infos.qteAdulte;
+				this.nbVelosEnfantsRestants += infos.qteEnfant;
+
+				// Fin
 				break;
+			}
 
-			case 5:
+			case 5: {
+				// Récupération de la base donnée du client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				if (infos == null) {
+					// TODO: erreur infos est null
+					return;
+				}
 
+				// Heure de fin par défaut
+				int hfin = 19;
+
+				// Calcul du montant à calculer
+				int prix = calculDureeLoc(infos.jourEmprunt, infos.heureDebut, this.jourCourant, hfin) * (infos.qteAdulte * TARIF_ADULTES + infos.qteEnfant * TARIF_ENFANTS);
+
+				// Suppression de la location en cours
+				maBaseDeLoc.supprimerClient(lex.chaineIdent(lex.getNumIdCourant()));
+
+				// Récupération des vélos
+				this.nbVelosAdultesRestants += infos.qteAdulte;
+				this.nbVelosEnfantsRestants += infos.qteEnfant;
+
+				// Fin
 				break;
+			}
 
-			case 6:
+			case 6: {
+				// Récupère la base donnée du client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				if (infos == null) {
+					// TODO: erreur infos est null
+					return;
+				}
 
+				// Récupère le nombre de vélos à louer pour les enfants
+				int nbVelos = lex.getvalEnt();
+				if (nbVelos > nbVelosEnfantsRestants)
+				{
+					// TODO: erreur, nombre de vélos loués plus grand que le nombre de vélos restants pour les enfants
+					return;
+				}
+
+				// Modification nombre d'enfants
+				infos.qteEnfant = lex.getvalEnt();
 				break;
+			}
 
-			case 7:
+			case 7: {
+				// Récupère la base donnée du client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				if (infos == null) {
+					// TODO: erreur infos est null
+					return;
+				}
 
+				// Récupère le nombre de vélos à louer pour les enfants
+				int nbVelos = lex.getvalEnt();
+				if (nbVelos > nbVelosAdultesRestants)
+				{
+					// TODO: erreur, nombre de vélors loués plus grand que le nombre de vélos restants pour les adultes
+					return;
+				}
+
+				// Modification nb enfants
+				infos.qteAdulte = lex.getvalEnt();
 				break;
+			}
 
-			case 8:
+			case 8: {
+				// Journée suivante
+				this.jourCourant++;
 
+				// Ajout d'une liste de clients
+				this.clientsParJour.add(this.jourCourant, new SmallSet());
 				break;
+			}
 
-			case 9:
-
+			case 9: {
+				// TODO: Affichage du bilan des journées
 				break;
+			}
 
-			case 10:
 
-				break;
-
-			default:
+			default: {
 				Lecture.attenteSurLecture("action " + numAction + " non prevue");
+			}
 		}
 
 		// Ajout d'une operation correcte
