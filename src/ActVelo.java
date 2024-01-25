@@ -1,11 +1,10 @@
 import java.io.InputStream;
 import java.util.ArrayList;
 
-//TODO completer noms trinome
 /**
  * La classe ActVelo met en oeuvre les actions de l'automate d'analyse syntaxique des locations de velos
  * 
- * @author ??, ??, ??
+ * @author NOE Louis-Quentin, MBASSI ATANGANA Blaise, POINT Marie
  * janvier 2024
  */
 
@@ -14,14 +13,20 @@ public class ActVelo extends AutoVelo {
 
 	/** table des actions */
 	private final int[][] ACTION =
-		{ 	/* Etat      ADULTE DEBUT ENFANT   FIN   HEURES  IDENT  NBENTIER  VIRG PTVIRG  BARRE AUTRES  */
-			/* 0 */     {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,    -1,    -1   },
-			/* 1 */     {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,    -1,    -1   },
-			/* 2 */     {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,    -1,    -1   },
-			//TODO completer la table ACTION
-			/* ...		{...} */  
-
-		} ;      
+		{ 	/* Etat     ADULTE DEBUT ENFANT   FIN   HEURES  IDENT  NBENTIER  VIRG PTVIRG  BARRE AUTRES  */
+			/* 0  */    {  -1,  -1,    -1,    -1,     -1,     1,      -1,     -1,   -1,    10,    -1     },
+			/* 1  */    {  -1,   4,    -1,     6,     -1,    -1,       2,     -1,   -1,    -1,    -1     },
+			/* 2  */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
+			/* 3  */    {  -1,   3,    -1,     5,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
+			/* 4  */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,    9,    -1,    -1     },
+			/* 5  */    {  -1,  -1,    -1,    -1,     -1,    -1,       2,     -1,   -1,    -1,    -1     },
+			/* 6  */    {   7,  -1,     8,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
+			/* 7  */    {  -1,  -1,    -1,    -1,     -1,    -1,       2,     -1,    9,    -1,    -1     },
+			/* 8  */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,    9,    -1,    -1     },
+			/* 9  */    {  -1,  -1,     8,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
+			/* 10 */    {  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     },
+			/* 11 */ 	{  -1,  -1,    -1,    -1,     -1,    -1,      -1,     -1,   -1,    -1,    -1     }
+		} ;
 
 	/** constructeur classe ActVelo
 	 * @param flot : donnee a analyser
@@ -85,7 +90,7 @@ public class ActVelo extends AutoVelo {
 
 	
 	/** nombre de velos initialement disponibles */
-	private static final int MAX_VELOS_ADULTES = 50, MAX_VELOS_ENFANT = 20;
+	private static final int MAX_VELOS_ADULTES = 50, MAX_VELOS_ENFANTS = 20;
 	
 
 	/**
@@ -122,56 +127,97 @@ public class ActVelo extends AutoVelo {
 	// nbOperationCorrectes correspond a toutes les operations sans erreur 
 	// de la donnee a analyser
 	private int nbOperationCorrectes;
-	
+
+	// nombre de vélos restants
+	private int nbVelosAdultesRestants;
+	private int nbVelosEnfantsRestants;
+
 	// ensemble des clients differents vus chaque jour 
 	// clientsParJour.get(i) donne l'ensemble des clients differents vus le ieme jour
 	//		(NB: SmallSet.class fourni dans libClass_UtilitairesVelo)
 	private ArrayList<SmallSet> clientsParJour;
-	
-	// TODO completer la declaration des variables necessaires aux actions
-	// *******************************************************************
-	
 
-	
 	/**
 	 * initialisations a effectuer avant les actions
 	 */
 	private void initialisations() {
-		nbOperationCorrectes = 0; nbOperationTotales = 0;
-		clientsParJour=new ArrayList<SmallSet>();
+		this.nbOperationCorrectes = 0; this.nbOperationTotales = 0;
+		this.clientsParJour=new ArrayList<SmallSet>();
 		/** initialisation clients du premier jour
 		 * NB: le jour 0 n'est pas utilise */
-		clientsParJour.add(0,new SmallSet()); 
-		clientsParJour.add(1,new SmallSet()); 	
-		
-		// TODO completer l'initialisation des variables necessaires aux actions
-		// *********************************************************************
-		
+		this.clientsParJour.add(0,new SmallSet());
+		this.clientsParJour.add(1,new SmallSet());
+		this.nbVelosAdultesRestants = MAX_VELOS_ADULTES;
+		this.nbVelosEnfantsRestants = MAX_VELOS_ENFANTS;
 	} // fin initialisations
-
-
 
 	/**
 	 * execution d'une action
 	 * @param numAction :  numero de l'action a executer
 	 */
 	public void executer(int numAction) {
-		// System.out.println("etat  " + etatCourant + "  action  " + numAction);
+		System.out.println("etat  " + etatCourant + "  action  " + numAction);
+
+		// getNumIdCourant = id du client actuel
+		// getvalEnt = valeur entière de nbentier
 
 		switch (numAction) {
-		case -1:	// action vide
-			break;
-		
-			// TODO completer les actions
-			// *******************************************************************
-			
+			case -1:	// action vide
+				break;
 
-		default:
-			Lecture.attenteSurLecture("action " + numAction + " non prevue");
+			case 0:
+				// Réinitialize les variables des actions
+				this.initAction();
+				break;
+
+			case 1:
+
+				break;
+
+			case 2:
+				// Lis le nombre récupéré par l'analyseur lexical //TODO
+				break;
+
+			case 3:
+
+				break;
+
+			case 4:
+
+				break;
+
+			case 5:
+
+				break;
+
+			case 6:
+
+				break;
+
+			case 7:
+
+				break;
+
+			case 8:
+
+				break;
+
+			case 9:
+
+				break;
+
+			case 10:
+
+				break;
+
+			default:
+				Lecture.attenteSurLecture("action " + numAction + " non prevue");
 		}
+
+		// Ajout d'une operation correcte
+		this.nbOperationCorrectes += 1;
 	} // fin executer
 
-	
 
 	/**
 	 * 

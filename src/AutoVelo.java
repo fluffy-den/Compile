@@ -1,11 +1,11 @@
 import java.io.*;
-//TODO completer noms trinomes
+
 /**
  * La classe AutoVelo met en oeuvre l'automate d'analyse syntaxique des locations de velos
  * Realisation par interpreteur de tables
  * A COMPLETER
  * 
- * @author ??, ??, ??
+ * @author NOE Louis-Quentin, MBASSI ATANGANA Blaise, POINT Marie
  * janvier 2024
  */
 
@@ -18,16 +18,21 @@ public class AutoVelo extends Automate{
 	/** table des transitions */
 	
 	private static final int[][] TRANSIT =
-			
-		{
-		/* Etat      ADULTE DEBUT ENFANT   FIN   HEURES  IDENT  NBENTIER  VIRG PTVIRG  BARRE AUTRES  */
-		/* 0 */     {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,    -1,    -1   },
-		/* 1 */     {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,    -1,    -1   },
-		/* 2 */     {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,    -1,    -1   },
-		//TODO completer TRANSIT
-		/* ...		{...} */    
-
-		};
+		{ 	/* Etat     ADULTE DEBUT ENFANT   FIN   HEURES  IDENT  NBENTIER  VIRG PTVIRG  BARRE AUTRES  */
+			/* 0  */    {   0,    0,     0,      0,     0,     1,       0,     0,    0,    11,     0   },
+			/* 1  */    {  10,    5,    10,      4,    10,    10,       2,    10,   10,    10,    10   },
+			/* 2  */    {  10,   10,    10,     10,     3,    10,      10,    10,   10,    10,    10   },
+			/* 3  */    {  10,    5,    10,      4,    10,    10,      10,    10,   10,    10,    10   },
+			/* 4  */    {  10,   10,    10,     10,    10,    10,      10,     0,    0,    10,    10   },//TODO supp
+			/* 5  */    {  10,   10,    10,     10,    10,    10,       6,    10,   10,    10,    10   },
+			/* 6  */    {   7,   10,     8,     10,    10,    10,      10,    10,   10,    10,    10   },
+			/* 7  */    {  10,   10,    10,     10,    10,    10,       9,     0,    0,    10,    10   },
+			/* 8  */    {  10,   10,    10,     10,    10,    10,      10,     0,    0,    10,    10   },//TODO supp
+			/* 9  */    {  10,   10,     8,     10,    10,    10,      10,    10,   10,    10,    10   },
+			/* 10 */    {   0,    0,     0,      0,     0,     0,       0,     0,    0,     0,     0   },
+			/* 10 */    {   0,    0,     0,      0,     0,     0,       0,     0,    0,     0,     0   },
+			/* 11 */ 	{  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,    -1,    -1   }
+		} ;
 
 	/** gestion de l'affichage sur la fenetre de trace de l'execution */
 	public void newObserver(ObserverAutomate oAuto, ObserverLexique oLex ){

@@ -83,7 +83,6 @@ public class LexVelo extends Lex {
 			lireCarLu();
 
 		/** On lit le caractère actuel pour savoir quel branche choisir dans l'automate **/
-		boolean isAlphabetic = true;
 		String s = new String("");
 
 		/** Le caractère lu est une barre **/
@@ -110,78 +109,40 @@ public class LexVelo extends Lex {
 		/** Le caractère lu est une lettre **/
 		else if (Character.isAlphabetic(carLu))
 		{
-			isAlphabetic = true;
 			s += carLu;
+
+			/** Lit la chaîne de caractères et vérifie si ce sont toujours des lettres **/
+			lireCarLu();
+			while (Character.isAlphabetic(carLu) || Character.isDigit(carLu))
+			{
+				s += carLu;
+				lireCarLu();
+			}
+
+			/** On met la chaîne de caractères en majuscule **/
+			s.toUpperCase();
+
+			/** Détecter le mot reconnu dans le tableau **/
+			int i = tabIdent.indexOf(s);
+
+			/** Si pas reconnu, alors ajout **/
+			if (i == -1)
+			{
+				numIdCourant = tabIdent.size();
+				tabIdent.add(numIdCourant, s);
+				return IDENT;
+			}
+			else
+			{
+				return i;
+			}
 		}
 
 		/** Le caractère lu est un chiffre **/
 		else if (Character.isDigit(carLu))
 		{
-			isAlphabetic = false;
 			s += carLu;
-		}
 
-		/** Autres **/
-		else
-		{
-			lireCarLu();
-			return AUTRES;
-		}
-
-		/** Détecte si ident **/
-		if (isAlphabetic) {
-
-			/** Lit la chaîne de caractères et vérifie si ce sont toujours des lettres **/
-			lireCarLu();
-			while (Character.isAlphabetic(carLu))
-			{
-				s += carLu;
-				lireCarLu();
-			}
-			if (Character.isDigit(carLu)) return AUTRES;
-
-			/** On met la chaîne de caractères en majuscule **/
-			s.toUpperCase();
-
-			/** Traite la chaîne de caractères **/
-			switch (s)
-			{
-				case "ADULTE":
-					return ADULTE;
-				case "DEBUT":
-					return DEBUT;
-				case "ENFANT":
-					return ENFANT;
-				case "FIN":
-					return FIN;
-				case "HEURES":
-					return HEURES;
-				default:
-					/** Détecter le mot reconnu dans le tableau **/
-					int i = IDENT;
-					for (; i < tabIdent.size(); ++i)
-					{
-						if (s.equals(tabIdent.get(i)))
-						{
-							numIdCourant = i;
-							break;
-						}
-					}
-
-					/** Si pas reconnu, alors ajout **/
-					if (i == tabIdent.size())
-					{
-						numIdCourant = i;
-						tabIdent.add(i, s);
-					}
-
-					/** Fin **/
-					return IDENT;
-			}
-		}
-
-		/** Détecte si chiffre **/
-		else {
 			/** Lit la chaîne de caractères et vérifie si ce sont toujours des chiffres **/
 			lireCarLu();
 			carLu = getCarLu();
@@ -194,6 +155,13 @@ public class LexVelo extends Lex {
 			/** Ce sont des chiffres **/
 			valEnt = Integer.valueOf(s);
 			return NBENTIER;
+		}
+
+		/** Autres **/
+		else
+		{
+			lireCarLu();
+			return AUTRES;
 		}
 	}
 
