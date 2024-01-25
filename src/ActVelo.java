@@ -81,7 +81,7 @@ public class ActVelo extends AutoVelo {
 			etatCourant = etatErreur;
 			break;
 		default:
-			Lecture.attenteSurLecture("parametre incorrect pour erreur");
+			Lecture.attenteSurLecture("Parametre incorrect pour erreur");
 		}
 	}
 
@@ -165,11 +165,42 @@ public class ActVelo extends AutoVelo {
 	}
 
 	/**
+	 *
+	 * utilitaire de calcul de la duree d'une location
+	 *
+	 * @param jourDebutLoc : numero du jour de début de la location à partir de 1
+	 * @param heureDebutLoc: heure du debut de la location, entre 8 et 19
+	 * @param jourFinLoc   : numero du jour de la fin de la location à partir de 1
+	 * @param heureFinLoc  : heure de fin de la location, entre 8 et 19
+	 * @return nombre d'heures comptabilisées pour la location
+	 * 			(les heures de nuit entre 19h et 8h ne sont pas comptabilisees)
+	 */
+	private int calculDureeLoc(int jourDebutLoc, int heureDebutLoc, int jourFinLoc, int heureFinLoc) {
+		int duree;
+		// velos rendus le jour de l'emprunt
+		if (jourDebutLoc == jourFinLoc) {
+			if (heureFinLoc != heureDebutLoc) duree = heureFinLoc - heureDebutLoc;
+			else duree = 1;
+			// velos rendus quelques jours apres l'emprunt (la duree ne peut pas etre negative)
+		} else {
+			duree = 19 - heureDebutLoc; // duree du premier jour
+			duree = duree + (heureFinLoc - 8); // ajout de la duree du dernier jour
+			if (jourFinLoc > jourDebutLoc + 1) { // plus 24h par jour intermediaire
+				duree = duree + 11 * (jourFinLoc - jourDebutLoc - 1);
+			}
+		}
+		return duree;
+	}
+
+	/**
 	 * execution d'une action
 	 * @param numAction :  numero de l'action a executer
 	 */
 	public void executer(int numAction) {
 		System.out.println("etat  " + etatCourant + "  action  " + numAction);
+
+		// Ceci est une nouvelle opération
+		this.nbOperationTotales++;
 
 		// Récupère l'instance de l'analyseur lexical
 		LexVelo lex = this.getLex();
@@ -196,6 +227,10 @@ public class ActVelo extends AutoVelo {
 				if (infos == null) {
 					maBaseDeLoc.enregistrerLoc(nom, this.jourCourant, -1, -1, -1);
 				}
+				else
+				{
+					erreur(NONFATALE, "Erreur - Le client " + nom + " est déjà présent dans la liste.");
+				}
 
 				// Ajout du client dans la liste des clients du jour
 				this.clientsParJour.get(this.jourCourant).add(lex.getNumIdCourant());
@@ -206,7 +241,7 @@ public class ActVelo extends AutoVelo {
 				// Récupération de la base donnée du client
 				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
 				if (infos == null) {
-					// TODO: erreur infos est null
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
 					return;
 				}
 
@@ -214,7 +249,7 @@ public class ActVelo extends AutoVelo {
 				int hdebut = lex.getvalEnt();
 				if (hdebut < 8 || hdebut > 19)
 				{
-					// TODO: erreur hdebut n'est pas compris entre [8, 19]
+					erreur(NONFATALE, "Erreur - La valeur de l'heure de début : " + hdebut + " n'est pas comprise dans [8, 19].");
 					return;
 				}
 
@@ -227,7 +262,7 @@ public class ActVelo extends AutoVelo {
 				// Récupération de la base donnée du client
 				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
 				if (infos == null) {
-					// TODO: erreur infos est null
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
 					return;
 				}
 
@@ -240,7 +275,7 @@ public class ActVelo extends AutoVelo {
 				// Récupération de la base donnée du client
 				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
 				if (infos == null) {
-					// TODO: erreur infos est null
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
 					return;
 				}
 
@@ -248,12 +283,14 @@ public class ActVelo extends AutoVelo {
 				int hfin = lex.getvalEnt();
 				if (hfin < 8 || hfin > 19)
 				{
-					// TODO: erreur hdebut n'est pas compris entre [8, 19]
+					erreur(NONFATALE, "Erreur - La valeur de l'heure de fin : " + hfin + " n'est pas comprise dans [8, 19].");
 					return;
 				}
-
-				// Calcul du montant à calculer
-				int prix = calculDureeLoc(infos.jourEmprunt, infos.heureDebut, this.jourCourant, hfin) * (infos.qteAdulte * TARIF_ADULTES + infos.qteEnfant * TARIF_ENFANTS);
+				if (hfin < infos.heureDebut)
+				{
+					erreur(FATALE, "Erreur Fatale - L'heure de fin : " + hfin + " est plus petite que l'heure de début : " + infos.heureDebut);
+					return;
+				}
 
 				// Suppression de la location en cours
 				maBaseDeLoc.supprimerClient(lex.chaineIdent(lex.getNumIdCourant()));
@@ -261,6 +298,14 @@ public class ActVelo extends AutoVelo {
 				// Récupération des vélos
 				this.nbVelosAdultesRestants += infos.qteAdulte;
 				this.nbVelosEnfantsRestants += infos.qteEnfant;
+
+				// Calcul du montant à calculer
+				int prix = calculDureeLoc(infos.jourEmprunt, infos.heureDebut, this.jourCourant, hfin) *
+						(infos.qteAdulte * TARIF_ADULTES + infos.qteEnfant * TARIF_ENFANTS);
+
+				// Affichage de la recette actuelle
+				Ecriture.ecrireStringln("Le client: " + infos.nomClient + " doit payer : " + prix + " euros pour " +
+						infos.qteAdulte + " velo(s) adulte et " + infos.qteEnfant + " velo(s) enfant.");
 
 				// Fin
 				break;
@@ -270,7 +315,7 @@ public class ActVelo extends AutoVelo {
 				// Récupération de la base donnée du client
 				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
 				if (infos == null) {
-					// TODO: erreur infos est null
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
 					return;
 				}
 
@@ -278,7 +323,8 @@ public class ActVelo extends AutoVelo {
 				int hfin = 19;
 
 				// Calcul du montant à calculer
-				int prix = calculDureeLoc(infos.jourEmprunt, infos.heureDebut, this.jourCourant, hfin) * (infos.qteAdulte * TARIF_ADULTES + infos.qteEnfant * TARIF_ENFANTS);
+				int prix = calculDureeLoc(infos.jourEmprunt, infos.heureDebut, this.jourCourant, hfin) *
+						(infos.qteAdulte * TARIF_ADULTES + infos.qteEnfant * TARIF_ENFANTS);
 
 				// Suppression de la location en cours
 				maBaseDeLoc.supprimerClient(lex.chaineIdent(lex.getNumIdCourant()));
@@ -286,6 +332,10 @@ public class ActVelo extends AutoVelo {
 				// Récupération des vélos
 				this.nbVelosAdultesRestants += infos.qteAdulte;
 				this.nbVelosEnfantsRestants += infos.qteEnfant;
+
+				// Affichage de la recette actuelle
+				Ecriture.ecrireStringln("Le client: " + infos.nomClient + " doit payer : " + prix + " euros pour " +
+						infos.qteAdulte + " velo(s) adulte et " + infos.qteEnfant + " velo(s) enfant.");
 
 				// Fin
 				break;
@@ -295,7 +345,7 @@ public class ActVelo extends AutoVelo {
 				// Récupère la base donnée du client
 				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
 				if (infos == null) {
-					// TODO: erreur infos est null
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
 					return;
 				}
 
@@ -303,12 +353,16 @@ public class ActVelo extends AutoVelo {
 				int nbVelos = lex.getvalEnt();
 				if (nbVelos > nbVelosEnfantsRestants)
 				{
-					// TODO: erreur, nombre de vélos loués plus grand que le nombre de vélos restants pour les enfants
+					erreur(NONFATALE, "Erreur - Tentative de location de vélos enfants plus grand que le nombre " +
+							"disponible, nombre disponible : " + nbVelosEnfantsRestants + ", nombre demandé : " + nbVelos);
 					return;
 				}
 
 				// Modification nombre d'enfants
 				infos.qteEnfant = lex.getvalEnt();
+
+				// Enlève les vélos en location
+				nbVelosEnfantsRestants -= lex.getvalEnt();
 				break;
 			}
 
@@ -316,7 +370,7 @@ public class ActVelo extends AutoVelo {
 				// Récupère la base donnée du client
 				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
 				if (infos == null) {
-					// TODO: erreur infos est null
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
 					return;
 				}
 
@@ -324,67 +378,70 @@ public class ActVelo extends AutoVelo {
 				int nbVelos = lex.getvalEnt();
 				if (nbVelos > nbVelosAdultesRestants)
 				{
-					// TODO: erreur, nombre de vélors loués plus grand que le nombre de vélos restants pour les adultes
+					erreur(NONFATALE, "Erreur - Tentative de location de vélos adultes plus grand que le nombre " +
+							"disponible, nombre disponible : " + nbVelosAdultesRestants + ", nombre demandé : " + nbVelos);
 					return;
 				}
 
 				// Modification nb enfants
 				infos.qteAdulte = lex.getvalEnt();
+
+				// Enlève les vélos en location
+				nbVelosAdultesRestants -= lex.getvalEnt();
 				break;
 			}
 
 			case 8: {
+				// Affichage du bilan du jour
+				Ecriture.ecrireStringln("Bilan du jour " + this.jourCourant);
+				Ecriture.ecrireStringln("Nombre de velos adulte manquants : " + (MAX_VELOS_ADULTES - nbVelosAdultesRestants));
+				Ecriture.ecrireStringln("Nombre de velos enfants manquants : " + (MAX_VELOS_ENFANTS - nbVelosEnfantsRestants));
+				Ecriture.ecrireStringln("Operations correctes : " + nbOperationCorrectes + " - Nombre total d'operations : " + nbOperationTotales);
+				Ecriture.ecrireStringln("Voici les clients qui doivent encore rendre des velos");
+				maBaseDeLoc.afficherLocationsEnCours();
+
 				// Journée suivante
 				this.jourCourant++;
 
-				// Ajout d'une liste de clients
+				// Construction de la liste de clients du jour suivant
 				this.clientsParJour.add(this.jourCourant, new SmallSet());
 				break;
 			}
 
 			case 9: {
-				// TODO: Affichage du bilan des journées
+				// Calcul du jour avec le nombre le plus élevé de clients
+				int maxJour = 1, maxClients = 0;
+				for (int j = 1, t = this.clientsParJour.size(); j < t; ++j)
+				{
+					if (this.clientsParJour.get(j).size() > maxClients)
+					{
+						maxClients = this.clientsParJour.get(j).size();
+						maxJour    = j;
+					}
+				}
+
+				// Affichage
+				Ecriture.ecrireStringln("Le jour de plus grande affluence est le jour : " + maxJour + " avec " + maxClients + " clients différents servis.");
 				break;
 			}
 
+			case 10: {
+				// Gestion erreur de syntaxe
+				Ecriture.ecrireStringln("Erreur de syntaxe sur " + lex.getCarLu() + "...");
+
+				// Lis les prochains symboles
+
+				break;
+			}
 
 			default: {
 				Lecture.attenteSurLecture("action " + numAction + " non prevue");
 			}
 		}
 
-		// Ajout d'une operation correcte
-		this.nbOperationCorrectes += 1;
+		// Si on arrive ici, l'opération est correcte et il n'y a pas eu d'erreurs
+		this.nbOperationCorrectes++;
 	} // fin executer
-
-
-	/**
-	 * 
-	 * utilitaire de calcul de la duree d'une location
-	 *
-	 * @param jourDebutLoc : numero du jour de début de la location à partir de 1
-	 * @param heureDebutLoc: heure du debut de la location, entre 8 et 19
-	 * @param jourFinLoc   : numero du jour de la fin de la location à partir de 1
-	 * @param heureFinLoc  : heure de fin de la location, entre 8 et 19
-	 * @return nombre d'heures comptabilisées pour la location 
-	 * 			(les heures de nuit entre 19h et 8h ne sont pas comptabilisees)
-	 */
-	private int calculDureeLoc(int jourDebutLoc, int heureDebutLoc, int jourFinLoc, int heureFinLoc) {
-		int duree;
-		// velos rendus le jour de l'emprunt
-		if (jourDebutLoc == jourFinLoc) { 
-			if (heureFinLoc != heureDebutLoc) duree = heureFinLoc - heureDebutLoc; 
-			else duree = 1;
-		// velos rendus quelques jours apres l'emprunt (la duree ne peut pas etre negative)
-		} else { 
-			duree = 19 - heureDebutLoc; // duree du premier jour
-			duree = duree + (heureFinLoc - 8); // ajout de la duree du dernier jour
-			if (jourFinLoc > jourDebutLoc + 1) { // plus 24h par jour intermediaire
-				duree = duree + 11 * (jourFinLoc - jourDebutLoc - 1);
-			} 
-		}
-		return duree;
-	}
 
 
 }
