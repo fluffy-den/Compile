@@ -430,6 +430,27 @@ public class ActVelo extends AutoVelo {
 				Ecriture.ecrireStringln("Erreur de syntaxe sur " + lex.getCarLu() + "...");
 
 				// Lis les prochains symboles
+				boolean ptVirgAvantBarre = true;
+				int s = lex.lireSymb();
+				while (true)
+				{
+					if (s == lex.BARRE)
+					{
+						// On ignore le dernier jour pour le bilan du nombre maximum de personnes dans une journée
+						this.clientsParJour.remove(this.jourCourant);
+						this.jourCourant--;
+						break;
+					}
+					else if (s == lex.PTVIRG || s == lex.VIRG)
+					{
+						break;
+					}
+					else
+					{
+						s = lex.lireSymb();
+					}
+				}
+
 
 				break;
 			}
