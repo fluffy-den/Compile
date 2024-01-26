@@ -158,7 +158,7 @@ public class ActVelo extends AutoVelo {
 		this.clientsParJour.add(1,new SmallSet());
 		this.nbVelosAdultesRestants = MAX_VELOS_ADULTES;
 		this.nbVelosEnfantsRestants = MAX_VELOS_ENFANTS;
-		this.idActuel = 0;
+		this.idActuel = -1;
 	} // fin initialisations
 
 	/**
@@ -441,6 +441,9 @@ public class ActVelo extends AutoVelo {
 
 				// Construction de la liste de clients du jour suivant
 				this.clientsParJour.add(this.jourCourant, new SmallSet());
+
+				// Réinitialisation de l'identifiant actuel
+				this.idActuel=-1;
 				break;
 			}
 
@@ -470,6 +473,7 @@ public class ActVelo extends AutoVelo {
 			case 10:{
 				this.nbOperationCorrectes++;
 				this.nbOperationTotales++;
+				this.idActuel=-1;
 				break;
 			}
 
@@ -481,6 +485,22 @@ public class ActVelo extends AutoVelo {
 				// NOTE: L'automate est ensuite censé ignorer les prochains caractères jusqu'à un point-virgule, une
 				// barre ou une virgule.
 
+				// Suppression de la location en cours, car erreur, si identifiant affecté
+				if (this.idActuel != -1) {
+					String nom = lex.chaineIdent(this.idActuel);
+					BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
+					if (maBaseDeLoc.getInfosClient(nom) != null) {
+						maBaseDeLoc.supprimerClient(nom);
+						Ecriture.ecrireStringln("Suppression du client : " + nom);
+
+						// Récupération des vélos de l'opération incorrecte.
+						if (infos.qteAdulte != -1) nbVelosAdultesRestants += infos.qteAdulte;
+						if (infos.qteEnfant != -1) nbVelosEnfantsRestants += infos.qteEnfant;
+					}
+				}
+
+				// Fin
+				this.idActuel=-1;
 				break;
 			}
 
