@@ -107,13 +107,14 @@ public class LexVelo extends Lex {
 		}
 
 		/** Le caractère lu est une lettre **/
-		else if (Character.isAlphabetic(carLu))
+
+		else if (Character.isLetter(carLu))
 		{
 			s += carLu;
 
 			/** Lit la chaîne de caractères et vérifie si ce sont toujours des lettres **/
 			lireCarLu();
-			while (Character.isAlphabetic(carLu) || Character.isDigit(carLu))
+			while (Character.isLetterOrDigit(carLu))
 			{
 				s += carLu;
 				lireCarLu();
@@ -123,18 +124,19 @@ public class LexVelo extends Lex {
 			s.toUpperCase();
 
 			/** Détecter le mot reconnu dans le tableau **/
-			int i = tabIdent.indexOf(s);
+			int i = this.tabIdent.indexOf(s);
 
 			/** Si pas reconnu, alors ajout **/
 			if (i == -1)
 			{
-				numIdCourant = tabIdent.size();
-				tabIdent.add(numIdCourant, s);
+				this.numIdCourant = this.tabIdent.size();
+				this.tabIdent.add(this.numIdCourant, s);
 				return IDENT;
 			}
 			else
 			{
-				return i;
+				this.numIdCourant = i;
+				if (this.numIdCourant > IDENT) return IDENT; else return i;
 			}
 		}
 
@@ -150,7 +152,7 @@ public class LexVelo extends Lex {
 				s += carLu;
 				lireCarLu();
 			}
-			if (Character.isAlphabetic(carLu)) return AUTRES;
+			if (Character.isLetter(carLu)) return AUTRES;
 
 			/** Ce sont des chiffres **/
 			valEnt = Integer.valueOf(s);

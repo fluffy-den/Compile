@@ -14,17 +14,17 @@ public class ActVelo extends AutoVelo {
 	/** table des actions */
 	private final int[][] ACTION =
 	{       /* Etat     ADULTE DEBUT ENFANT   FIN   HEURES  IDENT  NBENTIER  VIRG PTVIRG  BARRE AUTRES  */
-			/* 0  */   {  10,   10,    10,     10,    10,     1,      10,    10,   10,      9,    10   },
-			/* 1  */   {  10,    3,    10,      5,    10,    10,      10,    10,   10,     10,    10   },
-			/* 2  */   {  10,   10,    10,     10,    10,    10,      10,    10,   10,     10,    10   },
-			/* 3  */   {  10,    2,    10,      4,    10,    10,      10,    10,   10,     10,    10   },
-			/* 4  */   {  10,   10,    10,     10,    10,    10,      10,    10,   10,     10,    10   },
-			/* 5  */   {  10,   10,    10,     10,    10,    10,      10,    10,   10,     10,    10   },
-			/* 6  */   {   6,   10,     7,     10,    10,    10,      10,    10,   10,     10,    10   },
-			/* 7  */   {  10,   10,    10,     10,    10,    10,      10,    10,    8,     10,    10   },
-			/* 8  */   {  10,   10,     7,     10,    10,    10,      10,    10,   10,     10,    10   },
-			/* 9  */   {  10,   10,    10,     10,    10,     1,      10,    10,   10,     10,    10   },
-			/* 10 */   {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,     11,    -1   },
+			/* 0  */   {  11,   11,    11,     11,    11,     1,      11,    11,   11,      9,    11   },
+			/* 1  */   {  11,    3,    11,      5,    11,    11,      -1,    11,   11,     11,    11   },
+			/* 2  */   {  11,   11,    11,     11,    -1,    11,      11,    11,   11,     11,    11   },
+			/* 3  */   {  11,    2,    11,      4,    11,    11,      11,    11,   11,     11,    11   },
+			/* 4  */   {  11,   11,    11,     11,    11,    11,      11,    10,    8,     11,    11   },
+			/* 5  */   {  11,   11,    11,     11,    11,    11,      -1,    11,   11,     11,    11   },
+			/* 6  */   {   6,   11,     7,     11,    11,    11,      11,    11,   11,     11,    11   },
+			/* 7  */   {  11,   11,    11,     11,    11,    11,      -1,    10,    8,     11,    11   },
+			/* 8  */   {  11,   11,     7,     11,    11,    11,      11,    11,   11,     11,    11   },
+			/* 9  */   {  11,   11,    11,     11,    11,     1,      11,    11,   11,     11,    11   },
+			/* 10 */   {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,     12,    -1   },
 			/* 11 */   {  -1,   -1,    -1,     -1,    -1,    -1,      -1,    -1,   -1,     -1,    -1   }
 	} ;
 
@@ -137,6 +137,9 @@ public class ActVelo extends AutoVelo {
 	private int nbVelosAdultesRestants;
 	private int nbVelosEnfantsRestants;
 
+	// gère l'identifiant du client actuel
+	private int idActuel;
+
 	// ensemble des clients differents vus chaque jour 
 	// clientsParJour.get(i) donne l'ensemble des clients differents vus le ieme jour
 	//		(NB: SmallSet.class fourni dans libClass_UtilitairesVelo)
@@ -155,6 +158,7 @@ public class ActVelo extends AutoVelo {
 		this.clientsParJour.add(1,new SmallSet());
 		this.nbVelosAdultesRestants = MAX_VELOS_ADULTES;
 		this.nbVelosEnfantsRestants = MAX_VELOS_ENFANTS;
+		this.idActuel = 0;
 	} // fin initialisations
 
 	/**
@@ -199,9 +203,6 @@ public class ActVelo extends AutoVelo {
 	public void executer(int numAction) {
 		System.out.println("etat  " + etatCourant + "  action  " + numAction);
 
-		// Ceci est une nouvelle opération
-		this.nbOperationTotales++;
-
 		// Récupère l'instance de l'analyseur lexical
 		LexVelo lex = this.getLex();
 
@@ -219,18 +220,8 @@ public class ActVelo extends AutoVelo {
 			}
 
 			case 1: {
-				// Gère un nouveau identifiant
-				String nom = lex.chaineIdent(lex.getNumIdCourant());
-
-				// Ajout d'un nouveau client
-				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
-				if (infos == null) {
-					maBaseDeLoc.enregistrerLoc(nom, this.jourCourant, -1, -1, -1);
-				}
-				else
-				{
-					erreur(NONFATALE, "Erreur - Le client " + nom + " est déjà présent dans la liste.");
-				}
+				// Récupère l'identifiant du client actuel
+				this.idActuel = lex.getNumIdCourant();
 
 				// Ajout du client dans la liste des clients du jour
 				this.clientsParJour.get(this.jourCourant).add(lex.getNumIdCourant());
@@ -238,12 +229,8 @@ public class ActVelo extends AutoVelo {
 			}
 
 			case 2: {
-				// Récupération de la base donnée du client
-				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
-				if (infos == null) {
-					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
-					return;
-				}
+				// Nom
+				String nom = lex.chaineIdent(this.idActuel);
 
 				// Récupération de l'heure de début
 				int hdebut = lex.getvalEnt();
@@ -253,29 +240,46 @@ public class ActVelo extends AutoVelo {
 					return;
 				}
 
-				// Modification heures debut du client actuel
-				infos.heureDebut = hdebut;
+				// Enregistrement d'une nouvelle location
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
+				if (infos == null)
+				{
+					maBaseDeLoc.enregistrerLoc(nom, this.jourCourant, hdebut, -1, -1);
+				}
+				else
+				{
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " a déjà une location en cours.");
+					return;
+				}
 				break;
 			}
 
 			case 3: {
-				// Récupération de la base donnée du client
-				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
-				if (infos == null) {
-					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
+				// Nom
+				String nom = lex.chaineIdent(this.idActuel);
+
+				// Enregistrement d'une nouvelle location
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
+				if (infos == null)
+				{
+					maBaseDeLoc.enregistrerLoc(nom, this.jourCourant, 8, -1, -1);
+				}
+				else
+				{
+					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " a déjà une location en cours.");
 					return;
 				}
-
-				// Modification heures debut du client actuel à 8 (par défaut)
-				infos.heureDebut = 8;
 				break;
 			}
 
 			case 4: {
+				// Nom
+				String nom = lex.chaineIdent(this.idActuel);
+
 				// Récupération de la base donnée du client
-				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
 				if (infos == null) {
-					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
+					erreur(NONFATALE, "Erreur - Le client : " + nom + " n'a pas de location en cours.");
 					return;
 				}
 
@@ -293,7 +297,7 @@ public class ActVelo extends AutoVelo {
 				}
 
 				// Suppression de la location en cours
-				maBaseDeLoc.supprimerClient(lex.chaineIdent(lex.getNumIdCourant()));
+				maBaseDeLoc.supprimerClient(nom);
 
 				// Récupération des vélos
 				this.nbVelosAdultesRestants += infos.qteAdulte;
@@ -312,10 +316,13 @@ public class ActVelo extends AutoVelo {
 			}
 
 			case 5: {
+				// Nom
+				String nom = lex.chaineIdent(this.idActuel);
+
 				// Récupération de la base donnée du client
-				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
 				if (infos == null) {
-					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
+					erreur(NONFATALE, "Erreur - Le client : " + nom + " n'a pas de location en cours.");
 					return;
 				}
 
@@ -327,7 +334,7 @@ public class ActVelo extends AutoVelo {
 						(infos.qteAdulte * TARIF_ADULTES + infos.qteEnfant * TARIF_ENFANTS);
 
 				// Suppression de la location en cours
-				maBaseDeLoc.supprimerClient(lex.chaineIdent(lex.getNumIdCourant()));
+				maBaseDeLoc.supprimerClient(nom);
 
 				// Récupération des vélos
 				this.nbVelosAdultesRestants += infos.qteAdulte;
@@ -342,35 +349,13 @@ public class ActVelo extends AutoVelo {
 			}
 
 			case 6: {
+				// Nom
+				String nom = lex.chaineIdent(this.idActuel);
+
 				// Récupère la base donnée du client
-				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
 				if (infos == null) {
-					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
-					return;
-				}
-
-				// Récupère le nombre de vélos à louer pour les enfants
-				int nbVelos = lex.getvalEnt();
-				if (nbVelos > nbVelosEnfantsRestants)
-				{
-					erreur(NONFATALE, "Erreur - Tentative de location de vélos enfants plus grand que le nombre " +
-							"disponible, nombre disponible : " + nbVelosEnfantsRestants + ", nombre demandé : " + nbVelos);
-					return;
-				}
-
-				// Modification nombre d'enfants
-				infos.qteEnfant = lex.getvalEnt();
-
-				// Enlève les vélos en location
-				nbVelosEnfantsRestants -= lex.getvalEnt();
-				break;
-			}
-
-			case 7: {
-				// Récupère la base donnée du client
-				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(lex.chaineIdent(lex.getNumIdCourant()));
-				if (infos == null) {
-					erreur(NONFATALE, "Erreur - L'identifiant : " + lex.getNumIdCourant() + " n'a pas de client associé.");
+					erreur(NONFATALE, "Erreur - Le client : " + nom + " n'a pas de location en cours.");
 					return;
 				}
 
@@ -391,7 +376,39 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			case 7: {
+				// Nom
+				String nom = lex.chaineIdent(this.idActuel);
+
+				// Récupère la base donnée du client
+				BaseDeLoc.InfosClient infos = maBaseDeLoc.getInfosClient(nom);
+				if (infos == null) {
+					erreur(NONFATALE, "Erreur - Le client : " + nom + " n'a pas de location en cours.");
+					return;
+				}
+
+				// Récupère le nombre de vélos à louer pour les enfants
+				int nbVelos = lex.getvalEnt();
+				if (nbVelos > nbVelosEnfantsRestants)
+				{
+					erreur(NONFATALE, "Erreur - Tentative de location de vélos enfants plus grand que le nombre " +
+							"disponible, nombre disponible : " + nbVelosEnfantsRestants + ", nombre demandé : " + nbVelos);
+					return;
+				}
+
+				// Modification nombre d'enfants
+				infos.qteEnfant = lex.getvalEnt();
+
+				// Enlève les vélos en location
+				nbVelosEnfantsRestants -= lex.getvalEnt();
+				break;
+			}
+
 			case 8: {
+				// Ceci est une nouvelle opération correcte
+				this.nbOperationCorrectes++;
+				this.nbOperationTotales++;
+
 				// Affichage du bilan du jour
 				Ecriture.ecrireStringln("Bilan du jour " + this.jourCourant);
 				Ecriture.ecrireStringln("Nombre de velos adulte manquants : " + (MAX_VELOS_ADULTES - nbVelosAdultesRestants));
@@ -426,13 +443,22 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
-			case 10: {
-				// Gestion erreur de syntaxe
-				Ecriture.ecrireStringln("Erreur de syntaxe sur " + lex.getCarLu() + "...");
+			case 10:{
+				this.nbOperationCorrectes++;
+				this.nbOperationTotales++;
 				break;
 			}
 
 			case 11: {
+				// Gestion erreur de syntaxe
+				this.nbOperationTotales++;
+				Ecriture.ecrireStringln("Erreur de syntaxe sur " + lex.getCarLu() + "...");
+				// NOTE: L'automate est ensuite censé ignorer les prochains caractères jusqu'à un point-virgule, une
+				// barre ou une virgule.
+				break;
+			}
+
+			case 12: {
 				// On ignore le dernier jour pour le bilan général
 				this.clientsParJour.remove(this.jourCourant);
 				this.jourCourant--;
@@ -443,9 +469,6 @@ public class ActVelo extends AutoVelo {
 				Lecture.attenteSurLecture("action " + numAction + " non prevue");
 			}
 		}
-
-		// Si on arrive ici, l'opération est correcte et il n'y a pas eu d'erreurs
-		this.nbOperationCorrectes++;
 	} // fin executer
 
 
