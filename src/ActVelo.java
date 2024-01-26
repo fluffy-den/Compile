@@ -209,16 +209,19 @@ public class ActVelo extends AutoVelo {
 		// getNumIdCourant = id du client actuel
 		// getvalEnt = valeur entière de nbentier
 		switch (numAction) {
-			case -1: {    // action vide
+			// Action vide
+			case -1: {
 				break;
 			}
 
+			// Action initialisation
 			case 0: {
 				// Réinitialize les variables des actions
 				this.initAction();
 				break;
 			}
 
+			// Action identification
 			case 1: {
 				// Récupère l'identifiant du client actuel
 				this.idActuel = lex.getNumIdCourant();
@@ -228,6 +231,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action réception du mot clef début
 			case 2: {
 				// Nom
 				String nom = lex.chaineIdent(this.idActuel);
@@ -254,6 +258,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action réception du mot clef début avec valeur par défaut
 			case 3: {
 				// Nom
 				String nom = lex.chaineIdent(this.idActuel);
@@ -272,6 +277,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action réception du mot clef fin
 			case 4: {
 				// Nom
 				String nom = lex.chaineIdent(this.idActuel);
@@ -315,6 +321,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action réception du mot clef fin avec valeur par défaut
 			case 5: {
 				// Nom
 				String nom = lex.chaineIdent(this.idActuel);
@@ -348,6 +355,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action attribution du nombre de vélos enfants à la location
 			case 6: {
 				// Nom
 				String nom = lex.chaineIdent(this.idActuel);
@@ -365,6 +373,9 @@ public class ActVelo extends AutoVelo {
 				{
 					erreur(NONFATALE, "Erreur - Tentative de location de vélos adultes plus grand que le nombre " +
 							"disponible, nombre disponible : " + nbVelosAdultesRestants + ", nombre demandé : " + nbVelos);
+
+					// Suppression de la location, car erreur
+					maBaseDeLoc.supprimerClient(nom);
 					return;
 				}
 
@@ -376,6 +387,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action attribution du nombre de vélos adultes à la location
 			case 7: {
 				// Nom
 				String nom = lex.chaineIdent(this.idActuel);
@@ -393,6 +405,12 @@ public class ActVelo extends AutoVelo {
 				{
 					erreur(NONFATALE, "Erreur - Tentative de location de vélos enfants plus grand que le nombre " +
 							"disponible, nombre disponible : " + nbVelosEnfantsRestants + ", nombre demandé : " + nbVelos);
+
+					// Suppression de la location, car erreur
+					maBaseDeLoc.supprimerClient(nom);
+
+					// Mise à jour du nbVelosAdultesRestants si attribués
+					if (infos.qteAdulte != -1) nbVelosAdultesRestants += infos.qteAdulte;
 					return;
 				}
 
@@ -404,6 +422,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action point-virgule, affichage bilan du jour
 			case 8: {
 				// Ceci est une nouvelle opération correcte
 				this.nbOperationCorrectes++;
@@ -425,6 +444,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action fin (barre), affichage du bilan des locations.
 			case 9: {
 				// Calcul du jour avec le nombre le plus élevé de clients
 				int maxJour = 1, maxClients = 0;
@@ -440,24 +460,31 @@ public class ActVelo extends AutoVelo {
 				// Affichage
 				Ecriture.ecrireStringln("Le jour de plus grande affluence est le jour : " + maxJour + " avec " +
 						maxClients + " clients différents servis.");
+
+				// Réinitialisation
+				this.initAction();
 				break;
 			}
 
+			// Action virgule, si nous avons cette action, alors il n'y a eu aucune erreur
 			case 10:{
 				this.nbOperationCorrectes++;
 				this.nbOperationTotales++;
 				break;
 			}
 
+			// Action erreur de syntaxe.
 			case 11: {
 				// Gestion erreur de syntaxe
 				this.nbOperationTotales++;
 				Ecriture.ecrireStringln("Erreur de syntaxe sur " + lex.getCarLu() + "...");
 				// NOTE: L'automate est ensuite censé ignorer les prochains caractères jusqu'à un point-virgule, une
 				// barre ou une virgule.
+
 				break;
 			}
 
+			// Action barre trouvé à la place de point-virgule / virgule.
 			case 12: {
 				// On ignore le dernier jour pour le bilan général
 				this.clientsParJour.remove(this.jourCourant);
@@ -465,6 +492,7 @@ public class ActVelo extends AutoVelo {
 				break;
 			}
 
+			// Action non reconnue.
 			default: {
 				Lecture.attenteSurLecture("action " + numAction + " non prevue");
 			}
