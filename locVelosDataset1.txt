@@ -42,3 +42,127 @@ Yannick 4 HEURES DEBUT 1 ADULTE;
 Yannick 18 HEURES FIN;
 
 /
+
+
+Commentaire :
+#############
+Locations sur 8 jours, 4 clients qui louent. Yannick rend un vélo qu'il n'a
+pas emprunté (erreur non fatale) ainsi que LouisQuentin qui loue à 6 heures.
+Yannick loue également 1 vélo pour adulte, mais à 4 heures (erreur non fatale).
+Blaise loue un vélo à 12 heures et le rend à 10 heures (erreur fatale).
+
+	De la première journée à la dernière (sur les cas corrects):
+       LouisQuentin 26 euros par heure pendant 1 heure = 26 euros (la première location est une erreur non fatale).
+       Blaise 8 euros par heure pendant 7 heures = 56 euros (la seconde location avant que la première ne s'achève conduit à une erreur non fatale).
+       Marie 20 euros par heure pendant 11 heures = 220 euros (sur la journée 2 et 3)
+
+Resultat attendu
+################
+
+Le client:  LouisQuentin  doit payer : 26 euros pour 2 velo(s) adulte et 9 velo(s) enfant 
+
+Le client:  Blaise  doit payer : 56 euros pour 4 velo(s) adulte et 2 velo(s) enfant 
+
+Le client:  Marie  doit payer : 220 euros pour 1 velo(s) adulte et 2 velo(s) enfant 
+
+BILAN DU JOUR  1
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Nombre de velos adulte manquants :  0
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 3 - Nombre total d'operations : 4
+
+BILAN DU JOUR  2
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Nombre de velos adulte manquants :  0
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 0 - Nombre total d'operations : 1
+
+Voici les clients qui doivent encore rendre des velos
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+--------------    ----       ---        ---       ---     
+
+BILAN DU JOUR  3
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+LouisQuentin		3			12		12			16
+Marie				3			9		4			2
+Nombre de velos adulte manquants :  16
+Nombre de velos enfant manquants :  18
+
+Operations correctes : 3 - Nombre total d'operations : 4
+
+
+BILAN DU JOUR  4
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Nombre de velos adulte manquants :  0
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 0 - Nombre total d'operations : 1
+
+Voici les clients qui doivent encore rendre des velos
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+--------------    ----       ---        ---       ---     
+
+BILAN DU JOUR  5
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Nombre de velos adulte manquants :  0
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 0 - Nombre total d'operations : 1
+
+Voici les clients qui doivent encore rendre des velos
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+--------------    ----       ---        ---       ---    
+
+BILAN DU JOUR  6
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Nombre de velos adulte manquants :  0
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 0 - Nombre total d'operations : 1
+
+Voici les clients qui doivent encore rendre des velos
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+
+BILAN DU JOUR  7
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Yannick				7			4		1			0
+Nombre de velos adulte manquants :  1
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 0 - Nombre total d'operations : 1
+
+Voici les clients qui doivent encore rendre des velos
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+--------------    ----       ---        ---       ---  
+Yannick				7			4		1			0
+
+BILAN DU JOUR  8
+
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+---------------    ----      ---       ---       ---     
+Nombre de velos adulte manquants :  0
+Nombre de velos enfant manquants :  0
+
+Operations correctes : 1 - Nombre total d'operations : 1
+
+Voici les clients qui doivent encore rendre des velos
+      CLIENT      JOUR    HEURE_DEBUT  ADULTE    ENFANT
+--------------    ----       ---        ---       ---     
+
+Le jour de plus grande affluence  est : 1  avec 3 clients différents servis
